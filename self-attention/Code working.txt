@@ -1,0 +1,26 @@
+The code executes one forward pass of scaled dot-product self-attention on a tiny synthetic sequence.
+
+Step-wise semantics:
+	1.	X is a matrix of shape (3,4).
+Each of the 3 tokens is represented as a 4-dimensional embedding.
+	2.	Wq, Wk, Wv are learnable projection matrices.
+In an actual transformer they are parameters updated by gradient descent.
+	3.	Q = X @ Wq, K = X @ Wk, V = X @ Wv.
+Each token is projected into three spaces:
+Query (what this token wants), Key (what it offers), Value (information to aggregate).
+
+	4.	scores = Q @ K.T / sqrt(d).
+For every pair of tokens i,j, compute the similarity
+\frac{Q_i \cdot K_j}{\sqrt{d}}.
+This produces a 3 \times 3 matrix of unnormalized attention scores.
+
+	5.	Softmax row-wise normalizes each token’s scores into a probability distribution.
+Each row sums to 1.
+weights[i, j] = how much token i attends to token j.
+	6.	output = weights @ V.
+Each output vector is a weighted sum of all value vectors, where the weights encode learned relevance.
+Shape remains (3,4).
+
+Functionally:
+The code demonstrates the core transformer mechanism—each token computes a context-dependent representation
+by attending to all other tokens using learned similarity.

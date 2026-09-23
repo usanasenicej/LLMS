@@ -1,0 +1,65 @@
+[tool.poetry]
+name = "how-transformer-llms-work"
+version = "0.1.0"
+description = "Complete Transformer LLM Learning Project"
+authors = ["Somesh Diwan"]
+readme = "README.md"
+license = "MIT"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.14"
+
+# Core LLM
+torch = "^2.1.0"
+transformers = "^4.36.0"
+tokenizers = "^0.15.0"
+sentencepiece = "^0.2.0"
+accelerate = "^0.25.0"
+# Web & UI
+fastapi = "^0.108.0"
+uvicorn = {extras = ["standard"], version = "^0.25.0"}
+streamlit = "^1.51.0"
+pydantic = "^2.5.0"
+
+# Data Science
+numpy = "^1.24.0"
+pandas = "^2.0.0"
+matplotlib = "^3.8.0"
+plotly = "^5.18.0"
+
+# Utilities
+requests = "^2.32.0"
+tqdm = "^4.66.0"
+python-dotenv = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+# Development tools (won't be installed in production)
+jupyter = "^1.0.0"
+notebook = "^7.0.0"
+pytest = "^7.4.0"
+black = "^23.12.0"
+flake8 = "^7.0.0"
+mypy = "^1.8.0"
+
+[tool.poetry.group.docs.dependencies]
+# Documentation tools
+mkdocs = "^1.5.0"
+mkdocs-material = "^9.5.0"
+
+[tool.poetry.scripts]
+# Custom commands
+train = "scripts.train:main"
+serve = "scripts.serve:main"
+
+[tool.black]
+line-length = 88
+target-version = ['py310', 'py311']
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

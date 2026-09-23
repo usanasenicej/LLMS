@@ -1,0 +1,83 @@
+Transformer architecture (project-accurate, expanded, non-redundant)
+
+1. Tokenization and numerical encoding
+Inputs pass through SentencePiece → integer IDs → embedded using two matrices:
+E_src ∈ R[src_vocab × d_model], E_tgt ∈ R[tgt_vocab × d_model].
+Output tensors: [B, L, d_model].
+
+2. Positional encoding (sinusoidal)
+Added elementwise to embeddings.
+Implements continuous relative-position representation:
+PE(pos,2i)=sin(pos/10000^(2i/d_model)),
+PE(pos,2i+1)=cos(pos/10000^(2i/d_model)).
+Shape preserved: [B, L, d_model].
+
+3. Encoder (3 layers in your configuration)
+Each layer contains:
+
+• Self-attention
+Computes:
+Q = XW_q, K = XW_k, V = XW_v.
+Attention: softmax(QKᵀ / √d_k) V.
+Heads concatenated → linear projection.
+Complexity: O(L_src² · d_model).
+
+• Residual + LayerNorm
+X1 = LayerNorm(X + SelfAttn(X)).
+
+• Feed-Forward (positionwise)
+Two linear layers with ReLU:
+Linear(d_model→4d_model) → ReLU → Linear(4d_model→d_model).
+
+• Residual + LayerNorm
+X2 = LayerNorm(X1 + FFN(X1)).
+
+Final encoder output: [B, L_src, d_model].
+
+4. Decoder (3 layers)
+Each layer includes:
+
+• Masked self-attention
+Same formulation as encoder attention except mask enforces causal constraint:
+positions cannot attend to future positions.
+
+• Residual + LayerNorm
+
+• Cross-attention
+Queries come from decoder stream, keys/values from encoder output:
+Q = D W_q, K = Enc W_k, V = Enc W_v.
+Complexity: O(L_src · L_tgt · d_model).
+
+• Residual + LayerNorm
+
+• Feed-Forward
+
+• Residual + LayerNorm
+
+Decoder output: [B, L_tgt, d_model].
+
+5. Output projection layer
+Final linear layer converts decoder states into logits over Hindi vocabulary:
+Linear(d_model → vocab_hi)
+Output shape: [B, L_tgt, vocab_hi].
+
+6. Training dynamics
+Teacher forcing feeds ground-truth tokens into the decoder shifted by one position.
+Loss: CrossEntropyLoss(ignore_index=pad_id).
+Backprop updates all Transformer and embedding parameters.
+
+7. Inference pipeline
+Greedy: stepwise argmax(logits[t]).
+Batch: vectorized greedy for N sentences.
+Beam search: maintains top-k hypotheses ranked by accumulated log-prob.
+Attention-heatmap: cosine similarity between encoder outputs and decoder hidden states → matrix [L_tgt × L_src].
+
+8. Runtime characteristics
+Memory dominated by Q,K,V projections and attention score matrices.
+Your configuration (d_model=256, layers=3, heads=8) is within feasible CPU/GPU limits and supports clear visualization during UI operations.
+
+9. Artifact outputs from training
+• checkpoints saved to data/trained_models/…pt
+• run metadata saved to data/runs/<run_id>/metadata.json
+• loss curves saved under:
+loss_curve.json (list or list-of-dicts)

@@ -1,0 +1,31 @@
+Key domains interviewers target when asking about transformers and attention:
+
+Definition. Expect a precise explanation of self-attention: query–key similarity, softmax normalization,
+weighted sum of values, and the motivation for scaling.
+
+Computation steps. They may ask you to walk through a concrete example with small vectors and show
+how attention weights are formed.
+
+Complexity. Transformers avoid the sequential dependency of RNNs. Explain O(n²·d) cost from all-pairs
+attention and why long-sequence variants exist.
+
+Positional encoding. Why a permutation-equivariant mechanism needs explicit position information;
+sinusoidal encodings versus learned embeddings.
+
+Multi-head attention. Purpose of using several projections in parallel to capture heterogeneous relationships;
+concatenation and linear mixing.
+
+Encoder versus decoder. Encoder uses self-attention only. Decoder uses masked self-attention plus
+encoder–decoder cross-attention.
+
+Masking. Why it is required for autoregressive decoding; describe the triangular causal mask.
+
+Residual connections and layer norm. Why they stabilize training in deep stacks.
+
+Gradient flow and training dynamics. Why attention improves parallelization and reduces
+vanishing-gradient problems compared with RNNs.
+
+Failure modes. Quadratic memory, context fragmentation for very long sequences, and softmax saturation.
+
+These topics represent the standard conceptual pressure points used to assess working knowledge
+rather than memorized descriptions.

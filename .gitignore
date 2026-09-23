@@ -1,0 +1,86 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dll
+*.dylib
+
+.venv/
+venv/
+env/
+ENV/
+
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Large datasets – ignore
+tokenizer/data/corpus/
+tokenizer/data/json/
+
+# Training logs – ignore
+tokenizer/data/runs/
+!tokenizer/data/runs/.gitkeep
+
+# Training model checkpoints – ignore
+tokenizer/data/trained_models/
+*.pt
+*.bin
+*.safetensors
+
+# ALLOW tokenizer SPM models (these are required)
+# DO NOT ignore:
+# tokenizer/data/tokenizers/*.model
+# tokenizer/data/tokenizers/*.vocab
+
+*.log
+logs/
+events.out.tfevents.*
+
+.streamlit/
+**/.streamlit/
+
+~/.cache/huggingface/
+hf_cache/
+huggingface/
+datasets/
+
+temp/
+tmp/
+uploads/
+
+.idea/
+*.iml
+.vscode/
+
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+tokenizer/model_architecture/
+*.png
+*.jpg
+*.jpeg
+*.svg
+
+.ipynb_checkpoints/
+
+*.env
+*.token
+*.secret
+*.key
+*.credentials
+
+# ALLOW encoder–decoder transformer MODEL SOURCE FILES
+# Remove all these lines below — they break imports:
+
+#/encoder–decoder transformer in PyTorch/data/model/config.py
+#/encoder–decoder transformer in PyTorch/data/model/dummy_loader2.py
+#/encoder–decoder transformer in PyTorch/data/en_hi_tiny.json
+#/encoder–decoder transformer in PyTorch/data/model/positional_encoding.py
+#/encoder–decoder transformer in PyTorch/data/model/train2.py
+#/encoder–decoder transformer in PyTorch/data/model/transformer_mt.py
+/Transformer Architecture/models/

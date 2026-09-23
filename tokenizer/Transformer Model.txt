@@ -1,0 +1,112 @@
+Transformer model architecture
+
+1. Input embeddings
+English and Hindi token IDs are mapped through learned embedding matrices:
+E_src ∈ R[src_vocab × d_model]
+E_tgt ∈ R[tgt_vocab × d_model]
+
+Output shape after lookup:
+[batch, seq_len, d_model].
+
+2. Sinusoidal positional encoding
+Added to embeddings before entering encoder/decoder.
+Implements the canonical fixed formulation:
+
+PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))
+PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
+
+Enables the model to represent ordering without recurrence.
+
+3. Encoder stack (num_layers blocks)
+Each block contains:
+
+• Multi-Head Self-Attention
+Q = K = V = embeddings
+Attention computed over the whole source sequence.
+Output shape preserved.
+
+• Add + LayerNorm
+Residual connection before normalization.
+
+• Feed-Forward Network
+Two linear layers:
+Linear(d_model → 4*d_model) → ReLU → Linear(4*d_model → d_model)
+Operates position-wise.
+
+• Add + LayerNorm
+Second residual path.
+
+Final encoder output:
+enc_out: [batch, src_len, d_model].
+
+4. Decoder stack (num_layers blocks)
+Each block contains:
+
+• Masked Self-Attention
+Prevents attending to future tokens.
+Mask shape: [tgt_len × tgt_len].
+
+• Add + LayerNorm
+
+• Cross-Attention (Encoder–Decoder Attention)
+Q = decoder hidden states
+K,V = encoder outputs
+This links target-side predictions to source representations.
+
+• Add + LayerNorm
+
+• Feed-Forward Network
+
+• Add + LayerNorm
+
+Output:
+tgt_hidden: [batch, tgt_len, d_model].
+
+5. Output projection
+A final linear layer:
+Linear(d_model → hi_vocab_size)
+applied to each timestep of decoder output.
+Produces logits:
+[batch, tgt_len, vocab_size].
+
+Loss:
+CrossEntropyLoss(ignore_index=pad_id)
+between logits and shifted target sequence.
+
+6. Inference paths
+
+Greedy:
+At each step, argmax over final logits.
+
+Batch:
+Vectorized greedy decoding for N sentences.
+
+Beam search:
+Keeps top-k partial hypotheses, ranked by accumulated log-probabilities.
+Your implementation uses beam size from UI.
+
+Attention heatmap:
+Uses encoder outputs and decoder hidden states:
+cosine similarity across enc_out and each decoder step.
+Produces matrix [tgt_len × src_len].
+
+7. Computational profile
+Encoder complexity:
+O(L² * d_model) due to full self-attention.
+
+Decoder complexity:
+O(L² * d_model) masked self-attention
+plus
+O(L_src * L_tgt * d_model) cross-attention.
+
+configuration:
+d_model = 256
+nhead = 8
+num_layers = 3
+Balanced for CPU training.
+
+8. Weights storage
+After training, model parameters stored in:
+data/trained_models/enhi_d256_L3_V300_<timestamp>.pt.
+
+Loaded by inference and FastAPI.
